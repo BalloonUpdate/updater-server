@@ -1,0 +1,31 @@
+		new DropTarget(rules, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter ()
+		{
+			@Override
+			public void drop(DropTargetDropEvent dtde) 
+			{
+				if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+				{
+					try 
+					{
+						dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+						@SuppressWarnings("unchecked")
+						List<File> list = (List<File>) (dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor));
+						ArrayList<String> rs = new ArrayList<>();
+						for(File per : list)
+						{
+							if(per.isDirectory())
+							{
+								rs.add(per.getAbsolutePath());
+							}
+						}
+						rules.setListData(rs.toArray(new String[0]));
+						dtde.dropComplete(true);
+					} 
+					catch (UnsupportedFlavorException e) {e.printStackTrace();}
+					catch (IOException e) {e.printStackTrace();}
+				}
+				else
+				{
+					dtde.rejectDrop();
+				}
+			}});

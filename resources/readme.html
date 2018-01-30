@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta markdowntohtml="https://www.bejson.com/convert/html2markdown/">
+<title>updater-服务端文档</title>
+</head>
+<body>
+<p><a href="https://git.coding.net/innc/updater-server.git">开源地址</a>
+<a href="http://www.mcbbs.net/forum.php?mod=viewthread&amp;tid=711833">mcbbs发布贴地址</a>
+<a href="https://pan.baidu.com/s/1d3TtyY">百度网盘下载地址</a></p>
+
+<p>文档版本：<strong>1.0</strong></p>
+
+<h2>配置文件的说明</h2>
+
+<h4>配置文件载入的说明</h4>
+
+<p>配置文件的载入方式分2种，<strong>内部载入</strong>和<strong>外部载入</strong></p>
+
+<p><strong>内部载入</strong>是指配置文件写在程序内部，不容易被误删，但修改步骤较为繁琐，内联配置文件一般在程序jar包里，把程序用压缩软件打开即可看见</p>
+
+<p><strong>外部载入</strong>是指配置文件写在程序外部，一般在程序所在目录里，及和程序文件放在一起，修改较为方便，但容易被误删</p>
+
+<p><strong>外部载入</strong> 的优先级<strong>高于</strong> <strong>内部载入</strong>，当外部配置文件存在时，程序只会读取外部配置文件，不会读取内部配置文件，当外部配置文件不存在时，才会读取内部配置文件。</p>
+
+<p><strong>外部配置文件可以不存在，但内部配置文件不能被删掉</strong></p>
+
+<h4>配置文件的说明</h4>
+
+<p>服务端配置文件不能像客户端一样使用内部载入，只能使用外部载入</p>
+
+<p>服务端有2个配置文件，分别是serverConfig.properties和rulesConfig.properties</p>
+
+<p>serverConfig.properties文件用于配置程序的工作参数</p>
+
+<p>rulesConfig.properties文件用于配置文件的更新规则</p>
+
+<h4>配置文件的位置</h4>
+
+<p>配置文件默认存在于程序jar包中，默认不需要创建。</p>
+
+<h4>外部配置文件的位置和创建</h4>
+
+<p>外部配置文件不会自动生成，需要手动创建，用压缩软件打开程序jar包，找到<strong>serverConfig.properties</strong>和<strong>rulesConfig.properties</strong>，提取到和程序jar包相同的目录下，即在程序jar包的旁边，已确保能程序能正确读取，即完成外部配置文件的创建。（外部配置文件的创建也就是把内部配置文件复制到程序jar包的旁边）</p>
+
+<h4>配置文件的修改</h4>
+
+<h6>serverConfig.properties文件的修改</h6>
+
+<p>使用文本编辑器打开配置文件，默认的模板为</p>
+
+<p><code>
+port=5398
+maxDownstreamSpeed=500
+maxOnlineClient=4
+clientJAR=clientJars
+</code></p>
+
+<p>其中有4个可设置项，分别是port，maxDownstreamSpeed，maxOnlineClient，clientJAR。对应说明如下：
+<em> port =&gt; 服务端监听的端口，只要不和其它程序发生冲突就可
+</em> maxDownstreamSpeed =&gt; 最大的下行速度，也就是文件下载限速，单位为Kb/s
+<em> maxOnlineClient =&gt; 同一时间最大的连接上的客户端数量，建议设置成2-4，建议不要超过12
+</em> clientJAR =&gt; 客户端Jar文件路径，请见 <em>动态更新</em> 章节</p>
+
+<p>修改完后保存</p>
+
+<h6>serverConfig.properties文件的修改</h6>
+
+<p>serverConfig.properties文件推荐用附带的<strong>规则配置小工具</strong>来修改</p>
+
+<p>打开<strong>规则配置小工具</strong>，点击加载，选择<strong>rulesConfig.properties</strong>并打开，可以点击添加规则，输入规则名字（这个名字随意，不会有任何影响，支持中文）后，双击创建的规则，打开编辑面板，在面板下方输入<strong>客户端路径</strong>和<strong>服务端路径</strong>，（客户端路径：例子 .minecraft/mods）（服务端路径：例子 clientmods）此处路径必须使用标准的相对路径，请不要在开头加上  . 符号，此处的<strong>忽略的文件列表</strong>也一样必须使用标准的相对路径（虽然 ./aabbcc和aabbcc填在这里是指向的同一个文件夹，但是尽量使用后者的格式，后者就是标准的格式，如果使用前者可能会导致忽略问文件的功能失效），在<strong>忽略的文件列表</strong>中的文件在同步时将被忽略掉，也就是不会删除和修改，常用来保护一些数据文件夹。修改完成后点击确定，然后保存回<strong>原文件</strong>，也就是serverConfig.properties文件</p>
+
+<h2>程序的启动</h2>
+
+<p>程序的启动方式分为两种：<strong>命令行启动</strong>和<strong>托盘UI启动</strong></p>
+
+<p>如果有桌面环境，建议选择<strong>托盘UI启动</strong>，如果没有桌面环境，建议选择<strong>命令行启动</strong></p>
+
+<p>小白推荐使用<strong>托盘UI启动</strong></p>
+
+<h4>命令行启动</h4>
+
+<p>如果想要以命令行的方式启动，只需要添加一个Java Class参数：<strong>noui</strong></p>
+
+<p>例子：<code>java -jar updater-server.jar noui</code></p>
+
+<h4>托盘UI启动</h4>
+
+<p>在安装好Java情况下。直接双击启动即可</p>
+
+<h2>动态更新</h2>
+
+<p>从<strong>客户端1.1版本</strong>和<strong>服务端1.1版本</strong>开始，支持客户端动态更新，可以理解为热更新，客户端文件只需要下载一次，客户端每次连接上服务器时，都会自己更新新的客户端，而不用再下载新的客户端文件了，serverConfig.properties文件里的clientJAR字段就是设置的客户端的执行文件。每次就客户端在连接上服务端时，客户端都会读取这个文件发送给客户端，以达到动态更新的目的。</p>
+</body>
+</html>
