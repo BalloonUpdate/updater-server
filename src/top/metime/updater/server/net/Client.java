@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import top.metime.updater.server.callback.ClientDisconnectedCallback;
-import top.metime.updater.server.memory.MClientJAR;
+import top.metime.updater.server.memory.ClientJAR;
 import top.metime.updater.server.memory.MRule;
 
 public class Client implements Runnable
@@ -19,14 +19,14 @@ public class Client implements Runnable
 	private Socket socket;
 	private int delay;
 	private MRule[] crs;
-	private MClientJAR clientJAR;
+	private ClientJAR clientJAR;
 	
 	private ClientDisconnectedCallback clientDisconnectedListener;
 	
 	private DataInputStream netIn;
 	private DataOutputStream netOut;
 	
-	public Client(Socket socket, int delay, MRule[] crs, MClientJAR clientJAR, ClientDisconnectedCallback cdl)
+	public Client(Socket socket, int delay, MRule[] crs, ClientJAR clientJAR, ClientDisconnectedCallback cdl)
 	{
 		this.delay = delay;
 		this.crs = crs;
@@ -59,7 +59,7 @@ public class Client implements Runnable
 				try
 				{
 					Class<?> pv = Class.forName(Service.NET_PROTOCOL_HANDLER_PACKAGE_NAME+".PV"+clientNetProtocolVer);
-					Constructor<?> cons = pv.getDeclaredConstructor(DataInputStream.class, DataOutputStream.class, int.class, MRule[].class, MClientJAR.class);
+					Constructor<?> cons = pv.getDeclaredConstructor(DataInputStream.class, DataOutputStream.class, int.class, MRule[].class, ClientJAR.class);
 					pv.getDeclaredMethod("handle").invoke(cons.newInstance(netIn, netOut, delay, crs, clientJAR));
 				}
 				catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex)

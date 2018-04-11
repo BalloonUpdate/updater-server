@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class MFolder extends MStorage
+public class MFolder extends MFileOrFolder
 {
-	private final LinkedList<MStorage> sublist = new LinkedList<>();
+	private final LinkedList<MFileOrFolder> sublist = new LinkedList<>();
 	
 	public MFolder(String name)
 	{
@@ -34,12 +34,12 @@ public class MFolder extends MStorage
 		}
 	}
 	
-	public void append(MStorage d)
+	public void append(MFileOrFolder d)
 	{
 		sublist.add(d);
 	}
 	
-	public LinkedList<MStorage> getAllList()
+	public LinkedList<MFileOrFolder> getAllList()
 	{
 		return sublist;
 	}
@@ -50,7 +50,7 @@ public class MFolder extends MStorage
 		JSONObject obj = new JSONObject();
 		JSONArray child = new JSONArray();
 		
-		for(MStorage per : getAllList())
+		for(MFileOrFolder per : getAllList())
 		{
 			child.put(per.toJSONObject());
 		}
@@ -67,7 +67,7 @@ public class MFolder extends MStorage
 		JSONObject obj = new JSONObject();
 		JSONArray child = new JSONArray();
 		
-		for(MStorage per : getAllList())
+		for(MFileOrFolder per : getAllList())
 		{
 			child.put(per.toJSONObject());
 		}

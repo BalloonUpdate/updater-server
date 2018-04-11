@@ -7,14 +7,43 @@ import java.lang.reflect.Modifier;
 import java.util.Properties;
 import top.metime.updater.server.tools.Base64;
 
+/**
+ * 该类表示一个服务对象正常启动所需要的信息
+ *
+ * @author innc
+ */
 public class MConfig 
 {
+
+	/**
+	 * 端口
+	 */
 	public int port;
+
+	/**
+	 * 最大下行速率（单位Kb/s）
+	 */
 	public int maxDownstreamSpeed;
+
+	/**
+	 * 最大同时在线客户端数
+	 */
 	public int maxOnlineClient;
-	//public boolean enableTray;
+
+	/**
+	 * 客户端Jar文件路径
+	 */
 	public String clientJAR;
+	//public boolean enableTray;
 	
+	/**
+	 * 从一个输入流（Properties文件的输入流）加载
+	 *
+	 * @param inputStream 输入流
+	 * @throws IOException IOException
+	 * @throws IllegalArgumentException IllegalArgumentException
+	 * @throws IllegalAccessException IllegalAccessException
+	 */
 	public void load(InputStream inputStream) throws IOException, IllegalArgumentException, IllegalAccessException
 	{
 		Properties prop = new Properties();
@@ -54,6 +83,14 @@ public class MConfig
 		}
 	}
 	
+	/**
+	 * 把Config对象转换成Propertie对象
+	 *
+	 * @param obj Config对象
+	 * @return 转换后的Propertie对象
+	 * @throws IllegalArgumentException IllegalArgumentException
+	 * @throws IllegalAccessException IllegalAccessException
+	 */
 	public Properties toProperties(MConfig obj) throws IllegalArgumentException, IllegalAccessException
 	{
 		Properties prop = new Properties();
@@ -74,6 +111,7 @@ public class MConfig
 		return prop;
 	}
 	
+/*
 	public static void main(String[] args) throws IllegalArgumentException, IllegalAccessException
 	{
 		MConfig mconfig = new MConfig();
@@ -92,11 +130,12 @@ public class MConfig
 		}
 		
 	}
-
+*/
+	
 	@Override
 	public String toString()
 	{
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		for(Field field : MConfig.class.getDeclaredFields())
 		{
@@ -104,7 +143,7 @@ public class MConfig
 			if(Modifier.isPublic(modifiers) || !Modifier.isStatic(modifiers))
 			{
 				try {
-					buffer.append(field.getName()+"="+String.valueOf(field.get(this))+"\n");
+					buffer.append(field.getName()).append("=").append(String.valueOf(field.get(this))).append("\n");
 				} 
 				catch (IllegalArgumentException | IllegalAccessException ex)
 				{

@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.json.JSONArray;
-
 import org.json.JSONObject;
 import top.metime.updater.server.tools.MD5;
 	
-public abstract class MStorage
+public abstract class MFileOrFolder
 {
 	protected String name;
 	
@@ -19,7 +18,7 @@ public abstract class MStorage
 	
 	public abstract JSONObject toJSONObject();
 	
-	 public static class Builder
+	public static class Builder
 	{
 		private HashMap<String, File> dict = new HashMap<>();
 		private MRule mrule;
@@ -33,8 +32,8 @@ public abstract class MStorage
 		
 		public Builder(JSONObject obj)
 		{
-			File serverPath = new File(obj.getString("serverPath"));
-			String clientPath = obj.getString("clientPath");
+			File localPath = new File(obj.getString("serverPath"));
+			String remotePath = obj.getString("clientPath");
 			
 			HashSet<String> ignoreFiles = new HashSet<>();
 			JSONArray ja = obj.getJSONArray("ignoreFiles");
@@ -44,15 +43,15 @@ public abstract class MStorage
 				ignoreFiles.add(ja.getString(c));
 			}
 
-			MFolder root = new MFolder(serverPath.getName());
-			wle(serverPath, root);
-			mrule = new MRule(dict, ignoreFiles, root, clientPath);
+			MFolder root = new MFolder(localPath.getName());
+			wle(localPath, root);
+			mrule = new MRule(dict, ignoreFiles, root, remotePath);
 		}
 		
 		
-		private void wle(File readDir, MFolder unrealDir)
+		private void wle(File RFile, MFolder VFile)
 		{
-			for(File per : readDir.listFiles())
+			for(File per : RFile.listFiles())
 			{
 				if(per.isFile())
 				{
@@ -65,17 +64,17 @@ public abstract class MStorage
 						md5 = "null";
 					}
 										
-					unrealDir.append(new MFile(per.getName(), per.length(), md5));
+					VFile.append(new MFile(per.getName(), per.length(), md5));
 					dict.put(md5, per);
 				}else{
 					MFolder sub = new MFolder(per.getName());
-					unrealDir.append(sub);
+					VFile.append(sub);
 					wle(per, sub);
 				}
 			}
 		}
 		
-		public MRule getRule()
+		public MRule build()
 		{
 			return mrule;
 		}

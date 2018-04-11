@@ -10,7 +10,7 @@ import top.metime.updater.server.memory.ClientJAR;
 import top.metime.updater.server.memory.MRule;
 import top.metime.updater.server.net.NP;
 
-public class PV0 extends NP//PV(prococol version)
+public class PV1 extends NP//PV(prococol version)
 {
 	
 	private final int delay;
@@ -18,7 +18,7 @@ public class PV0 extends NP//PV(prococol version)
 	private final ClientJAR clientJAR;
 	
 	
-	public PV0(DataInputStream netIn, DataOutputStream netOut, int delay, MRule[] rules, ClientJAR clientJAR)
+	public PV1(DataInputStream netIn, DataOutputStream netOut, int delay, MRule[] rules, ClientJAR clientJAR)
 	{
 		this.netIn = netIn;
 		this.netOut = netOut;
@@ -29,6 +29,9 @@ public class PV0 extends NP//PV(prococol version)
 
 	public void handle() throws IOException
 	{
+		String mainClass = "top.metime.updater.client.core.Main";
+		writeString(mainClass);
+		
 		//向客户端发送最新客户端
 		writeFile(clientJAR.clientJARFile);
 		

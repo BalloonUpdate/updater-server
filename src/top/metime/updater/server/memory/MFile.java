@@ -2,7 +2,7 @@ package top.metime.updater.server.memory;
 
 import org.json.JSONObject;
 
-public class MFile extends MStorage
+public class MFile extends MFileOrFolder
 {
 	private final long length;
 	private final String md5;

@@ -5,18 +5,23 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.HashSet;
 import javax.swing.JOptionPane;
-import top.metime.updater.server.config.ConfigGeter;
-import top.metime.updater.server.config.IgnoreGeter;
-import top.metime.updater.server.config.RulesGeter;
 import top.metime.updater.server.callback.ServiceEventHandleCallback;
-import top.metime.updater.server.callback.ThrowExceptionCallback;
-import top.metime.updater.server.memory.MClientJAR;
+import top.metime.updater.server.config.ConfigGeter;
+import top.metime.updater.server.config.RulesGeter;
+import top.metime.updater.server.excption.FileUnableParseExcption;
+import top.metime.updater.server.excption.InvalidRuleLocalPathException;
+import top.metime.updater.server.memory.ClientJAR;
 import top.metime.updater.server.memory.MConfig;
 import top.metime.updater.server.memory.MRule;
 import top.metime.updater.server.net.Service;
 import top.metime.updater.server.view.AdvTray;
 import top.metime.updater.server.view.ImageData;
 
+/**
+ * 该类表示以托盘UI形式来初始化
+ *
+ * @author innc
+ */
 public class TrayUI
 {
 	private static final String START = "Run";
@@ -24,7 +29,6 @@ public class TrayUI
 	
 	private ConfigGeter configGeter;
 	private RulesGeter rulesGeter;
-	private IgnoreGeter ignoreGeter;
 	
 	private AdvTray tray;
 	private Service service;
@@ -33,16 +37,21 @@ public class TrayUI
 	private MenuItem reload = null;
 	private MenuItem quit = null;
 		
-	public TrayUI(Service service, ConfigGeter configGeter, RulesGeter rulesGeter, IgnoreGeter ignoreGeter)
+	/**
+	 *
+	 * @param service
+	 * @param configGeter
+	 * @param rulesGeter
+	 */
+	public TrayUI(Service service, ConfigGeter configGeter, RulesGeter rulesGeter)
 	{
 		this.service = service;
 		this.configGeter = configGeter;
 		this.rulesGeter = rulesGeter;
-		this.ignoreGeter = ignoreGeter;
 		
 		tray = new AdvTray();
 		
-		runAndStop = new MenuItem("RunAndStop");
+		runAndStop = new MenuItem("Run/Stop");
 		reload = new MenuItem("Reload");
 		quit = new MenuItem("Exit");
 		
@@ -73,7 +82,7 @@ public class TrayUI
 	private void initEventHandle()
 	{
 		runAndStop.addActionListener((ActionEvent e)->{
-			runAndStopListener();
+			runOrStopListener();
 		});
 		
 		reload.addActionListener((ActionEvent e) -> {
@@ -120,7 +129,7 @@ public class TrayUI
 			}
 		});
 			
-		service.setThrowExceptionListener((Exception e)->
+		service.setThrowExceptionCallback((Exception e)->
 		{
 			tray.displayMessage("异常", e.getMessage()+"\n"+e.toString());
 			e.printStackTrace();
@@ -134,29 +143,87 @@ public class TrayUI
 
 	}
 	
-	private void runAndStopListener()
+	private void runOrStopListener()
 	{
 		if(service.isRunned())
 		{
 			service.stopService();
 		}else{
-			service.startService();
+			if(!service.startService())
+			{
+				tray.displayMessage("规则为空", "规则为空或者规则文件加载失败");
+			}
 		}
 	}
 	
 	private void reloadListener()
 	{
 		MConfig mconfig = configGeter.getMConfig();
-		HashSet<MRule> rules = rulesGeter.getRules();
+		HashSet<MRule> rules = null;
+		try
+		{
+			rules=rulesGeter.getRules();
+		}catch(FileUnableParseExcption ex)
+		{
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, ex.getMessage(), "失败", JOptionPane.ERROR_MESSAGE);
+		}
+		catch(InvalidRuleLocalPathException ex)
+		{
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null, ex.getMessage(), "规则无效", JOptionPane.ERROR_MESSAGE);
+//			System.exit(1);
+		}
+		
 		if(rules==null)
 		{
-			JOptionPane.showMessageDialog(null, "无法读取，文件格式错误", "读取失败", JOptionPane.ERROR_MESSAGE);
+//			JOptionPane.showMessageDialog(null, "无法读取，文件格式错误", "读取失败", JOptionPane.ERROR_MESSAGE);
 		}else{
 			System.out.println(mconfig.clientJAR);
-			MClientJAR cjar = new MClientJAR(new File(mconfig.clientJAR));
 			
-			service.load(mconfig.port, mconfig.maxDownstreamSpeed, mconfig.maxOnlineClient, rules.toArray(new MRule[0]), cjar);
-			tray.displayMessage("信息", "载入："+rules.size()+"条规则！\n"+mconfig.toString());
+			File clientJar = new File(mconfig.clientJAR);
+			
+			if(clientJar.exists())
+			{
+				if(clientJar.isDirectory())
+				{
+					tray.displayMessage("无法使用客户端核心包文件", "客户端核心包Jar文件只能是文件，不能是文件夹");
+				}else{
+					
+					/*
+					HashSet<MRule> noexists = new HashSet<>();
+					for(MRule rule : rules)
+					{
+						if(rule.getLocalRootDir().)
+					}
+*/
+					boolean f = true;
+					//检查规则中的每个文件夹是否存在
+					for(MRule rule : rules)
+					{
+						if(!new File(rule.getLocalRootDir().getName()).exists())
+						{
+							f = false;
+							tray.displayMessage("找不到文件夹", "文件夹："+rule.getLocalRootDir().getName()+"不存在");
+						}else{
+							tray.displayMessage("找到", new File(rule.getLocalRootDir().getName()).getAbsolutePath());
+						}
+					}
+
+					if(f)
+					{                                                       
+						ClientJAR cjar = new ClientJAR(clientJar);
+						
+						service.load(mconfig.port, mconfig.maxDownstreamSpeed, mconfig.maxOnlineClient, rules.toArray(new MRule[0]), cjar);
+						tray.displayMessage("信息", "载入："+rules.size()+"条规则！\n"+mconfig.toString());
+					}
+					
+				}
+			}else{
+				tray.displayMessage("找不到核心包文件", "找不到客户端核心包Jar文件，（"+mconfig.clientJAR+"），请检查文件是否存在");
+			}
+			
+			
 		}
 		
 	}
