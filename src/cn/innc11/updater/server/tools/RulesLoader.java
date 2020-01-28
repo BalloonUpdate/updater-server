@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 import cn.innc11.updater.server.excption.FileUnableParseExcption;
 import cn.innc11.updater.server.excption.InvalidRuleLocalPathException;
-import cn.innc11.updater.server.structure.MFileOrFolder;
+import cn.innc11.updater.server.structure.RemoteObject;
 import cn.innc11.updater.server.structure.RuleInstance;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class RulesLoader
 					throw new  InvalidRuleLocalPathException(ruleName, localPath.getAbsolutePath());
 				}
 				
-				MFileOrFolder.Builder builder = new MFileOrFolder.Builder(obj);
+				RemoteObject.Builder builder = new RemoteObject.Builder(obj);
 				rulesBuffer.add(builder.build());
 			}
 			catch(JSONException ex)

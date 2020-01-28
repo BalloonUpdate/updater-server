@@ -8,10 +8,10 @@ public class RuleInstance
 {
 	public HashMap<String, File> dict;
 	public HashSet<String> ignoreFiles;
-	public final MFolder localFolder;
+	public final RemoteFolder localFolder;
 	public final String remotePath;
 	
-	public RuleInstance(HashMap<String, File> dict, HashSet<String> ignoreFiles, MFolder localFolder, String remotePath)
+	public RuleInstance(HashMap<String, File> dict, HashSet<String> ignoreFiles, RemoteFolder localFolder, String remotePath)
 	{
 		this.dict = dict;
 		this.ignoreFiles = ignoreFiles;

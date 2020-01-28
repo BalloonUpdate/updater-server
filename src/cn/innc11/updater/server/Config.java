@@ -12,6 +12,7 @@ public class Config
 	public int port;
 	public int maxDownstreamSpeed;
 	public int maxOnlineClient;
+	public boolean ONLYmode;
 
 	public void load(InputStream inputStream) throws IOException, IllegalArgumentException, IllegalAccessException
 	{

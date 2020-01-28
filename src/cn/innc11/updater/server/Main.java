@@ -137,6 +137,14 @@ public class Main
 				scanner.nextLine();
 				System.out.println("正在退出");
 				service.stopService();
+
+				//System.out.println("再次按下Enter键来强制退出");
+				//scanner.nextLine();
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {e.printStackTrace();}
+				service.forceExit();
+				System.exit(1);
 			}else{
 				System.out.println("启动失败");
 				service.forceExit();

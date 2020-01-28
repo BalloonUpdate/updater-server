@@ -32,14 +32,17 @@ public abstract class Protocol
 		}
 	}
 	
-	public void writeFile(File file) throws IOException
+	public void writeFile(File file, boolean writeFileLength) throws IOException
 	{
 		//写出文件长度
 		try (FileInputStream fileIn = new FileInputStream(file))
 		{
-			//写出文件长度
-			netOut.writeLong(file.length());
-			
+			if(writeFileLength)
+			{
+				//写出文件长度
+				netOut.writeLong(file.length());
+			}
+
 			byte[] buffer = new byte[1024*4];
 			int len = 0;
 			while((len = fileIn.read(buffer))!=-1)
@@ -160,7 +163,6 @@ public abstract class Protocol
 
 	public void writeByteArrays(byte[] bytes) throws IOException
 	{
-
 		final int max = 1024;
 
 		int at = (int)(bytes.length / max);

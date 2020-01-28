@@ -5,15 +5,15 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class MFolder extends MFileOrFolder
+public class RemoteFolder extends RemoteObject
 {
-	private final LinkedList<MFileOrFolder> sublist = new LinkedList<>();
+	private final LinkedList<RemoteObject> sublist = new LinkedList<>();
 	
-	public MFolder(String name)
+	public RemoteFolder(String name)
 	{
 		this.name = name;
 	}
-	public MFolder(JSONObject ObjString)
+	public RemoteFolder(JSONObject ObjString)
 	{
 		name = ObjString.getString("name");
 		JSONArray array = ObjString.getJSONArray("child");
@@ -24,22 +24,22 @@ public class MFolder extends MFileOrFolder
 			//System.out.println(array.get(c));
 			if(obj.has("child"))
 			{
-				sublist.add(new MFolder(obj));
+				sublist.add(new RemoteFolder(obj));
 			}
 			else
 			{
-				sublist.add(new MFile(obj));
+				sublist.add(new RemoteFile(obj));
 			}
 			
 		}
 	}
 	
-	public void append(MFileOrFolder d)
+	public void append(RemoteObject d)
 	{
 		sublist.add(d);
 	}
 	
-	public LinkedList<MFileOrFolder> getAllList()
+	public LinkedList<RemoteObject> getAllList()
 	{
 		return sublist;
 	}
@@ -50,7 +50,7 @@ public class MFolder extends MFileOrFolder
 		JSONObject obj = new JSONObject();
 		JSONArray child = new JSONArray();
 		
-		for(MFileOrFolder per : getAllList())
+		for(RemoteObject per : getAllList())
 		{
 			child.put(per.toJSONObject());
 		}
@@ -67,7 +67,7 @@ public class MFolder extends MFileOrFolder
 		JSONObject obj = new JSONObject();
 		JSONArray child = new JSONArray();
 		
-		for(MFileOrFolder per : getAllList())
+		for(RemoteObject per : getAllList())
 		{
 			child.put(per.toJSONObject());
 		}

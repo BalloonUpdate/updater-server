@@ -8,9 +8,9 @@ import cn.innc11.updater.server.net.Protocol;
 
 public class PV1 extends Protocol
 {
-	private int delay;
-	private RuleInstance[] rules;
-	private byte[] clientJAR;
+	protected int delay;
+	protected RuleInstance[] rules;
+	protected byte[] clientJAR;
 
 	public PV1(DataInputStream netIn, DataOutputStream netOut, int delay, RuleInstance[] rules, byte[] clientJAR)
 	{
@@ -26,10 +26,16 @@ public class PV1 extends Protocol
 		String mainClass = "cn.innc11.updater.client.core.Main";
 		writeString(mainClass);
 
-		netOut.writeLong(clientJAR.length); // 写出文件长度
+		File file = new File("core.jar");
+		if(file.exists())
+		{
+			System.out.println("Write extend core.jar");
+			writeFile(file, true);
+		}else{
+			netOut.writeLong(clientJAR.length); // 写出文件长度
+			writeByteArrays(clientJAR); // 向客户端发送最新客户端
+		}
 
-		writeByteArrays(clientJAR); // 向客户端发送最新客户端
-		
 		netOut.writeInt(rules.length); // 写出规则数量
 		
 		for(RuleInstance per : rules)
@@ -38,7 +44,7 @@ public class PV1 extends Protocol
 		}
 	}
 
-	private void sendRule(RuleInstance rule) throws IOException
+	protected void sendRule(RuleInstance rule) throws IOException
 	{
 		HashMap<String, File> dict = rule.dict;
 
@@ -52,7 +58,7 @@ public class PV1 extends Protocol
 		}
 	}
 
-	private void handleFile(HashMap<String, File> dict) throws IOException
+	protected void handleFile(HashMap<String, File> dict) throws IOException
 	{
 		String key = new String(netIn.readUTF()); // 接收客户端发回来的Key
 		File file = dict.get(key); // 表里面寻找Key

@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import cn.innc11.updater.server.tools.MD5;
 	
-public abstract class MFileOrFolder
+public abstract class RemoteObject
 {
 	protected String name;
 	
@@ -25,7 +25,7 @@ public abstract class MFileOrFolder
 		
 		public Builder(File serv_local, String client_remote, HashSet<String> ignoreFiles)
 		{
-			MFolder root = new MFolder(serv_local.getName());
+			RemoteFolder root = new RemoteFolder(serv_local.getName());
 			wle(serv_local, root);
 			mrule = new RuleInstance(dict, ignoreFiles, root, client_remote);
 		}
@@ -43,13 +43,13 @@ public abstract class MFileOrFolder
 				ignoreFiles.add(ja.getString(c));
 			}
 
-			MFolder root = new MFolder(localPath.getName());
+			RemoteFolder root = new RemoteFolder(localPath.getName());
 			wle(localPath, root);
 			mrule = new RuleInstance(dict, ignoreFiles, root, remotePath);
 		}
 		
 		
-		private void wle(File RFile, MFolder VFile)
+		private void wle(File RFile, RemoteFolder VFile)
 		{
 			for(File per : RFile.listFiles())
 			{
@@ -64,10 +64,10 @@ public abstract class MFileOrFolder
 						md5 = "null";
 					}
 										
-					VFile.append(new MFile(per.getName(), per.length(), md5));
+					VFile.append(new RemoteFile(per.getName(), per.length(), md5));
 					dict.put(md5, per);
 				}else{
-					MFolder sub = new MFolder(per.getName());
+					RemoteFolder sub = new RemoteFolder(per.getName());
 					VFile.append(sub);
 					wle(per, sub);
 				}

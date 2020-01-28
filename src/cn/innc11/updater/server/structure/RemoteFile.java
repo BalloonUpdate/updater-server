@@ -2,18 +2,18 @@ package cn.innc11.updater.server.structure;
 
 import org.json.JSONObject;
 
-public class MFile extends MFileOrFolder
+public class RemoteFile extends RemoteObject
 {
 	private final long length;
 	private final String md5;
 	
-	public MFile(String name, long length, String md5)
+	public RemoteFile(String name, long length, String md5)
 	{
 		this.name = name;
 		this.length = length;
 		this.md5 = md5;
 	}
-	public MFile(JSONObject ObjString)
+	public RemoteFile(JSONObject ObjString)
 	{
 		name = ObjString.getString("name");
 		length = ObjString.getLong("length");
